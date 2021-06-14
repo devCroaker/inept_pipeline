@@ -1,7 +1,7 @@
 import * as cdk from '@aws-cdk/core'
 import * as pipelines from '@aws-cdk/pipelines'
 import * as codepipeline from '@aws-cdk/aws-codepipeline'
-import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
+import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions'
 
 export class IneptInfPipeline extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -24,7 +24,7 @@ export class IneptInfPipeline extends cdk.Stack {
       synthAction: pipelines.SimpleSynthAction.standardNpmSynth({
         sourceArtifact,
         cloudAssemblyArtifact,
-        installCommand: 'npm i -g npm && npm ci',
+        installCommand: 'npm i -g npm@latest && npm ci',
         environment: {
           privileged: true
         }
