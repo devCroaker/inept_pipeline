@@ -24,6 +24,7 @@ export class IneptInfPipeline extends cdk.Stack {
       synthAction: pipelines.SimpleSynthAction.standardNpmSynth({
         sourceArtifact,
         cloudAssemblyArtifact,
+        installCommand: 'npm ci',
         buildCommand: 'npm run build',
         environment: {
           privileged: true
