@@ -1,7 +1,7 @@
 import { Stack, Construct, SecretValue, StackProps } from '@aws-cdk/core'
 import { CdkPipeline, SimpleSynthAction } from '@aws-cdk/pipelines'
 import { Artifact } from '@aws-cdk/aws-codepipeline'
-import { GitHubSourceAction } from '@aws-cdk/aws-codepipeline-actions'
+import { GitHubSourceAction, GitHubTrigger } from '@aws-cdk/aws-codepipeline-actions'
 
 import {
   GITHUB_OWNER,
@@ -27,7 +27,8 @@ export class IneptInfPipeline extends Stack {
         repo: PIPELINE_REPO,
         branch: GITHUB_BRANCH,
         oauthToken: SecretValue.secretsManager(GITHUB_TOKEN),
-        output: sourceArtifact
+        output: sourceArtifact,
+        trigger: GitHubTrigger.WEBHOOK
       }),
       synthAction: SimpleSynthAction.standardNpmSynth({
         sourceArtifact,
