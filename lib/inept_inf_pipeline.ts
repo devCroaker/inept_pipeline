@@ -46,6 +46,7 @@ export class IneptInfPipeline extends Stack {
 
       /* Add application stages to the pipeline */
       const pipelineStage = new IneptPipelineStage(this, `IneptWebsite-${stage}`, {
+        stageDetails,
         env: { account: '388722820338', region }
       })
       pipeline.addApplicationStage(pipelineStage)
