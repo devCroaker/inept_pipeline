@@ -8,7 +8,7 @@ import {
   GITHUB_BRANCH,
   GITHUB_TOKEN,
   PIPELINE_REPO
-} from './config'
+} from './config/config'
 import { pipelineStages } from './config/pipeline_stages'
 import { IneptPipelineStage } from './inept_pipeline_stage'
 

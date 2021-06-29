@@ -1,4 +1,4 @@
-import { Construct, Stack, StackProps } from '@aws-cdk/core'
+import { CfnOutput, Construct, Stack, StackProps } from '@aws-cdk/core'
 import { Bucket } from '@aws-cdk/aws-s3'
 
 import { StageDetails } from './config/pipeline_stages'
@@ -16,6 +16,11 @@ export class IneptWebsiteStack extends Stack {
             websiteIndexDocument: 'index.html',
             websiteErrorDocument: 'error.html',
             publicReadAccess: true,
+        })
+
+        new CfnOutput(this, `IneptWebsiteBucket-${stage}`, {
+            exportName: `IneptWebsiteBucketArn-${stage}`,
+            value: websiteBucket.bucketArn
         })
     }
 }
