@@ -1,7 +1,7 @@
 import { IneptWebsiteStack } from './IneptWebsiteStack'
 import { Stage, Construct, StageProps } from '@aws-cdk/core'
 
-import { StageDetails } from '../config/pipeline_stages'
+import { StageDetails } from '../config/PipelineStages'
 
 interface IneptStageProps extends StageProps {
     stageDetails: StageDetails

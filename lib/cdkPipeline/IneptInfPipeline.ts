@@ -18,7 +18,8 @@ export class IneptInfPipeline extends Stack {
 
     /* Setup the basic self updating pipeline */
     const sourceArtifact = new Artifact()
-    const cloudAssemblyArtifact = new Artifact();
+    const cloudAssemblyArtifact = new Artifact()
+
     const pipeline = new CdkPipeline(this, 'IneptPipeline', {
       pipelineName: 'IneptPipeline',
       cloudAssemblyArtifact,

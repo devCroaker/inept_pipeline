@@ -1,5 +1,5 @@
 import { Construct, Stack, StackProps } from '@aws-cdk/core'
-import { StageDetails } from '../config/pipeline_stages'
+import { StageDetails } from '../config/PipelineStages'
 import { IneptCodeBuildPipeline } from '../codePipeline/IneptCodeBuildPipeline'
 
 interface IneptStackProps extends StackProps {
