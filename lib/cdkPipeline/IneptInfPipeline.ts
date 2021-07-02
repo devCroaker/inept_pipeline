@@ -8,9 +8,9 @@ import {
   GITHUB_BRANCH,
   GITHUB_TOKEN,
   PIPELINE_REPO
-} from './config/config'
-import { pipelineStages } from './config/pipeline_stages'
-import { IneptPipelineStage } from './inept_pipeline_stage'
+} from '../config/config'
+import { PipelineStages } from '../config/PipelineStages'
+import { IneptPipelineStage } from './IneptPipelineStage'
 
 export class IneptInfPipeline extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -41,7 +41,7 @@ export class IneptInfPipeline extends Stack {
       })
     })
 
-    pipelineStages.map(stageDetails => {
+    PipelineStages.map(stageDetails => {
       const { stage, region } = stageDetails
 
       /* Add application stages to the pipeline */

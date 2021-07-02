@@ -3,7 +3,7 @@ export interface StageDetails {
     region: string
 }
 
-export const pipelineStages: StageDetails[] = [
+export const PipelineStages: StageDetails[] = [
     {
         stage: 'beta',
         region: 'us-west-1'
