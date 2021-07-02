@@ -50,7 +50,7 @@ export class IneptCodeBuildPipeline extends Construct {
                 actionName: `Website-${stage}`,
                 project: new PipelineProject(this, `BuildWebsite-${stage}`, {
                   projectName: `Website-${stage}`,
-                  buildSpec: BuildSpec.fromSourceFilename('')
+                  buildSpec: BuildSpec.fromSourceFilename('./build.yml')
                 }),
                 input: outputSources,
                 outputs: [outputWebsite]
