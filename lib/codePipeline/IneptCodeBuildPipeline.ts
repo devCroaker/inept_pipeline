@@ -16,6 +16,7 @@ export class IneptCodeBuildPipeline extends Construct {
         const { stageDetails: { stage } } = props
 
         const websiteBucket = new Bucket(this, `IneptWebsiteFiles-${stage}`, {
+            bucketName: `inept-website-files-${stage}`,
             websiteIndexDocument: 'index.html',
             websiteErrorDocument: 'error.html',
             publicReadAccess: true,
@@ -30,10 +31,10 @@ export class IneptCodeBuildPipeline extends Construct {
           const outputWebsite = new Artifact()
       
           pipeline.addStage({
-            stageName: `Source-${stage}`,
+            stageName: 'Source',
             actions: [
               new GitHubSourceAction({
-                actionName: `Checkout-${stage}`,
+                actionName: 'Checkout',
                 owner: GITHUB_OWNER,
                 repo: WEBSITE_REPO,
                 oauthToken: SecretValue.secretsManager(GITHUB_TOKEN),
@@ -44,12 +45,12 @@ export class IneptCodeBuildPipeline extends Construct {
           })
       
           pipeline.addStage({
-            stageName: `Build-${stage}`,
+            stageName: 'Build',
             actions: [
               new CodeBuildAction({
-                actionName: `Website-${stage}`,
-                project: new PipelineProject(this, `BuildWebsite-${stage}`, {
-                  projectName: `Website-${stage}`,
+                actionName: 'Website',
+                project: new PipelineProject(this, 'BuildWebsite', {
+                  projectName: `IneptWebsite-${stage}`,
                   buildSpec: BuildSpec.fromSourceFilename('./build.yml')
                 }),
                 input: outputSources,
@@ -59,10 +60,10 @@ export class IneptCodeBuildPipeline extends Construct {
           })
 
           pipeline.addStage({
-            stageName: `Deploy-${stage}`,
+            stageName: 'Deploy',
             actions: [
                 new S3DeployAction({
-                    actionName: `Website-${stage}`,
+                    actionName: 'Website',
                     input: outputWebsite,
                     bucket: websiteBucket
                 })
