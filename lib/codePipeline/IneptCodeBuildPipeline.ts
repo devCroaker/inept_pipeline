@@ -52,7 +52,7 @@ export class IneptCodeBuildPipeline extends Construct {
                 actionName: 'Website',
                 project: new PipelineProject(this, 'BuildWebsite', {
                   projectName: `IneptWebsite-${stage}`,
-                  buildSpec: BuildSpec.fromSourceFilename('./lib/codePipeline/build.yml')
+                  buildSpec: BuildSpec.fromSourceFilename('./buildspec.yml')
                 }),
                 input: outputSources,
                 outputs: [outputWebsite]
