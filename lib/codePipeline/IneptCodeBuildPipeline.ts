@@ -4,26 +4,15 @@ import { Artifact, Pipeline } from '@aws-cdk/aws-codepipeline'
 import { CodeBuildAction, GitHubSourceAction, GitHubTrigger, S3DeployAction } from '@aws-cdk/aws-codepipeline-actions'
 import { Bucket } from '@aws-cdk/aws-s3'
 import { GITHUB_BRANCH, GITHUB_OWNER, GITHUB_TOKEN, WEBSITE_REPO } from '../config/config'
-import { StageDetails } from '../config/PipelineStages'
 
-export interface CodeBuildPipelineProps {
-    stageDetails: StageDetails
-}
+const stages = ['Beta', 'Prod']
 
 export class IneptCodeBuildPipeline extends Construct {
-    constructor(scope: Construct, id: string, props: CodeBuildPipelineProps) {
+    constructor(scope: Construct, id: string) {
         super(scope, id)
-        const { stageDetails: { stage } } = props
 
-        const websiteBucket = new Bucket(this, `IneptWebsiteFiles-${stage}`, {
-            bucketName: `inept-website-files-${stage}`,
-            websiteIndexDocument: 'index.html',
-            websiteErrorDocument: 'error.html',
-            publicReadAccess: true,
-        })
-
-        const pipeline = new Pipeline(this, `IneptWebCodePipeline-${stage}`, {
-            pipelineName: `IneptWebCodePipeline-${stage}`,
+        const pipeline = new Pipeline(this, `IneptWebCodePipeline`, {
+            pipelineName: `IneptWebCodePipeline`,
             restartExecutionOnUpdate: true
           })
       
@@ -51,7 +40,7 @@ export class IneptCodeBuildPipeline extends Construct {
               new CodeBuildAction({
                 actionName: 'Website',
                 project: new PipelineProject(this, 'BuildWebsite', {
-                  projectName: `IneptWebsite-${stage}`,
+                  projectName: `IneptWebsite`,
                   buildSpec: BuildSpec.fromSourceFilename('./buildspec.yml')
                 }),
                 input: outputSources,
@@ -60,16 +49,25 @@ export class IneptCodeBuildPipeline extends Construct {
             ]
           })
 
-          pipeline.addStage({
-            stageName: 'Deploy',
-            actions: [
-                new S3DeployAction({
-                    actionName: 'Website',
-                    input: outputWebsite,
-                    bucket: websiteBucket
-                })
-            ]
+        stages.forEach(stage => {
+          const websiteBucket = new Bucket(this, `IneptWebsiteFiles${stage}`, {
+            bucketName: `inept-website-files-${stage.toLowerCase()}`,
+            websiteIndexDocument: 'index.html',
+            websiteErrorDocument: 'error.html',
+            publicReadAccess: true,
           })
+  
+            pipeline.addStage({
+              stageName: `Deploy${stage}`,
+              actions: [
+                  new S3DeployAction({
+                      actionName: `Website${stage}`,
+                      input: outputWebsite,
+                      bucket: websiteBucket
+                  })
+              ]
+            })
+        })
 
     }
 }

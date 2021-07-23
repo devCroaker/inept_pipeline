@@ -9,7 +9,6 @@ import {
   GITHUB_TOKEN,
   PIPELINE_REPO
 } from '../config/config'
-import { PipelineStages } from '../config/PipelineStages'
 import { IneptPipelineStage } from './IneptPipelineStage'
 
 export class IneptInfPipeline extends Stack {
@@ -42,15 +41,10 @@ export class IneptInfPipeline extends Stack {
       })
     })
 
-    PipelineStages.map(stageDetails => {
-      const { stage, region } = stageDetails
-
       /* Add application stages to the pipeline */
-      const pipelineStage = new IneptPipelineStage(this, `IneptWebsite-${stage}`, {
-        stageDetails,
-        env: { account: '388722820338', region }
-      })
-      pipeline.addApplicationStage(pipelineStage)
+    const pipelineStage = new IneptPipelineStage(this, `IneptWebsite`, {
+      env: { account: '388722820338', region: 'us-west-2' }
     })
+    pipeline.addApplicationStage(pipelineStage)
   }
 }
