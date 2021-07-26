@@ -7,7 +7,8 @@ import {
   GITHUB_OWNER,
   GITHUB_BRANCH,
   GITHUB_TOKEN,
-  PIPELINE_REPO
+  PIPELINE_REPO,
+  AWS_REGION
 } from '../config/config'
 import { IneptPipelineStage } from './IneptPipelineStage'
 
@@ -43,7 +44,7 @@ export class IneptInfPipeline extends Stack {
 
       /* Add application stages to the pipeline */
     const pipelineStage = new IneptPipelineStage(this, `IneptWebsite`, {
-      env: { account: '388722820338', region: 'us-west-2' }
+      env: { account: '388722820338', region: AWS_REGION }
     })
     pipeline.addApplicationStage(pipelineStage)
   }
