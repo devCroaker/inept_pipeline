@@ -12,7 +12,7 @@ export const stages: stage[] = [
     },
     {
         stage: 'Prod',
-        subdomain: ''
+        subdomain: 'www'
     }
 ]
 
