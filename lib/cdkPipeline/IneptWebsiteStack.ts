@@ -13,7 +13,7 @@ import {
 } from '@aws-cdk/aws-cloudfront'
 import { CloudFrontTarget } from '@aws-cdk/aws-route53-targets/lib'
 import { IneptCodeBuildPipeline } from '../codePipeline/IneptCodeBuildPipeline'
-import { AWS_REGION, WEBSITE_DOMAIN } from '../config/config'
+import { AWS_SSL_REGION, WEBSITE_DOMAIN } from '../config/config'
 import { stages } from '../config/stageDetails'
 
 export class IneptWebsiteStack extends Stack {
@@ -37,7 +37,7 @@ export class IneptWebsiteStack extends Stack {
             const certificate = new DnsValidatedCertificate(this, `IneptCertificate${stageName}`, {
                 domainName,
                 hostedZone: zone,
-                region: AWS_REGION
+                region: AWS_SSL_REGION
             })
 
             const websiteBucket = new Bucket(this, `IneptWebsiteFiles${stageName}`, {
