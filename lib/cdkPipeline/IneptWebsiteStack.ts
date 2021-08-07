@@ -2,10 +2,10 @@ import { Construct, Stack, RemovalPolicy } from '@aws-cdk/core'
 import { Bucket } from '@aws-cdk/aws-s3'
 import { PolicyStatement } from '@aws-cdk/aws-iam'
 import { ARecord, HostedZone, RecordTarget } from '@aws-cdk/aws-route53'
+import { HttpsRedirect } from '@aws-cdk/aws-route53-patterns'
 import { DnsValidatedCertificate } from '@aws-cdk/aws-certificatemanager'
 import { 
-    CloudFrontWebDistribution, 
-    OriginProtocolPolicy, 
+    CloudFrontWebDistribution,
     OriginAccessIdentity, 
     SecurityPolicyProtocol, 
     SSLMethod, 
@@ -29,11 +29,17 @@ export class IneptWebsiteStack extends Stack {
         const cloudFrontOAI = new OriginAccessIdentity(this, 'IneptOAI', {
             comment: 'OAI for inept website'
         })
+
+        new HttpsRedirect(this, 'wwwToNonWww', {
+            recordNames: [`www.${WEBSITE_DOMAIN}`],
+            targetDomain: WEBSITE_DOMAIN,
+            zone
+        })
         
         stages.forEach(stage => {
             const { stage: stageName, subdomain } = stage
 
-            const domainName = subdomain + '.' + WEBSITE_DOMAIN
+            const domainName = (stageName === 'Beta') ? subdomain + '.' + WEBSITE_DOMAIN : WEBSITE_DOMAIN
             const certificate = new DnsValidatedCertificate(this, `IneptCertificate${stageName}`, {
                 domainName,
                 hostedZone: zone,
@@ -42,6 +48,8 @@ export class IneptWebsiteStack extends Stack {
 
             const websiteBucket = new Bucket(this, `IneptWebsiteFiles${stageName}`, {
                 bucketName: `inept-website-files-${stageName.toLowerCase()}`,
+                websiteIndexDocument: "index.html",
+                websiteErrorDocument: "index.html",
                 removalPolicy: RemovalPolicy.DESTROY
             })
 
@@ -69,7 +77,7 @@ export class IneptWebsiteStack extends Stack {
                 }]
             })
 
-            const aRecord = new ARecord(this, `IneptAliasRecord${stageName}`, {
+            new ARecord(this, `IneptAliasRecord${stageName}`, {
                 recordName: domainName,
                 target: RecordTarget.fromAlias(
                     new CloudFrontTarget(distribution)
