@@ -1,6 +1,6 @@
 import { Construct, SecretValue } from '@aws-cdk/core'
 import { Bucket } from '@aws-cdk/aws-s3'
-import { BuildSpec, PipelineProject } from '@aws-cdk/aws-codebuild'
+import { BuildSpec, PipelineProject, BuildEnvironmentVariableType } from '@aws-cdk/aws-codebuild'
 import { Artifact, Pipeline } from '@aws-cdk/aws-codepipeline'
 import { CodeBuildAction, GitHubSourceAction, GitHubTrigger, S3DeployAction } from '@aws-cdk/aws-codepipeline-actions'
 import { GITHUB_BRANCH, GITHUB_OWNER, GITHUB_TOKEN, WEBSITE_REPO } from '../config/config'
@@ -17,7 +17,6 @@ export class IneptCodeBuildPipeline extends Construct {
     })
 
     const outputSources = new Artifact()
-    const outputWebsite = new Artifact()
 
     pipeline.addStage({
       stageName: 'Source',
@@ -34,22 +33,31 @@ export class IneptCodeBuildPipeline extends Construct {
       ]
     })
 
-    pipeline.addStage({
-      stageName: 'Build',
-      actions: [
-        new CodeBuildAction({
-          actionName: 'Website',
-          project: new PipelineProject(this, 'BuildWebsite', {
-            projectName: `IneptWebsite`,
-            buildSpec: BuildSpec.fromSourceFilename('./buildspec.yml')
-          }),
-          input: outputSources,
-          outputs: [outputWebsite]
-        })
-      ]
-    })
-
     this.addDeployStage = (stageName: string, websiteBucket: Bucket) => {
+
+      const outputWebsite = new Artifact()
+
+      pipeline.addStage({
+        stageName: 'Build',
+        actions: [
+          new CodeBuildAction({
+            actionName: 'Website',
+            project: new PipelineProject(this, 'BuildWebsite', {
+              projectName: `IneptWebsite`,
+              environmentVariables: {
+                websiteBucket: {
+                  value: websiteBucket.bucketName,
+                  type: BuildEnvironmentVariableType.PLAINTEXT
+                }
+              },
+              buildSpec: BuildSpec.fromSourceFilename('./buildspec.yml')
+            }),
+            input: outputSources,
+            outputs: [outputWebsite]
+          })
+        ]
+      })
+
       pipeline.addStage({
         stageName: `Deploy${stageName}`,
         actions: [

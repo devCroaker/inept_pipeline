@@ -1,4 +1,4 @@
-type stage = {
+export type stage = {
     stage: string,
     subdomain: string,
 }
