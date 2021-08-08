@@ -3,7 +3,7 @@ import { Bucket } from '@aws-cdk/aws-s3'
 import { BuildSpec, PipelineProject, BuildEnvironmentVariableType } from '@aws-cdk/aws-codebuild'
 import { Artifact, Pipeline } from '@aws-cdk/aws-codepipeline'
 import { CodeBuildAction, GitHubSourceAction, GitHubTrigger, S3DeployAction } from '@aws-cdk/aws-codepipeline-actions'
-import { GITHUB_BRANCH, GITHUB_OWNER, GITHUB_TOKEN, WEBSITE_REPO } from '../config/config'
+import { GITHUB_BRANCH, GITHUB_OWNER, GITHUB_TOKEN, WEBSITE_REPO, AWS_REGION } from '../config/config'
 import { Role, ServicePrincipal, ManagedPolicy, PolicyStatement } from '@aws-cdk/aws-iam'
 import { AuthOutputs } from '../auth/AuthStack'
 
@@ -76,6 +76,10 @@ export class IneptCodeBuildPipeline extends Construct {
               environmentVariables: {
                 websiteBucket: {
                   value: websiteBucket.bucketName,
+                  type: BuildEnvironmentVariableType.PLAINTEXT
+                },
+                region: {
+                  value: AWS_REGION,
                   type: BuildEnvironmentVariableType.PLAINTEXT
                 },
                 userPoolId: {
