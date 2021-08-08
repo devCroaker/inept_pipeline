@@ -45,7 +45,10 @@ export class IneptCodeBuildPipeline extends Construct {
       role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AWSCodeBuildAdminAccess'))
       role.addToPolicy(new PolicyStatement({
         actions: ['s3:*'],
-        resources: [`${websiteBucket.bucketArn}/*`]
+        resources: [
+          `${websiteBucket.bucketArn}`,
+          `${websiteBucket.bucketArn}/*`
+        ]
       }))
 
       pipeline.addStage({
