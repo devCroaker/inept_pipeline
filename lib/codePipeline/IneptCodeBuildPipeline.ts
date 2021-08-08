@@ -38,10 +38,10 @@ export class IneptCodeBuildPipeline extends Construct {
       const outputWebsite = new Artifact()
 
       pipeline.addStage({
-        stageName: 'Build',
+        stageName: `Build${stageName}`,
         actions: [
           new CodeBuildAction({
-            actionName: 'Website',
+            actionName: `BuildWebsite${stageName}`,
             project: new PipelineProject(this, `BuildWebsite${stageName}`, {
               projectName: `IneptWebsite${stageName}`,
               environmentVariables: {
@@ -62,7 +62,7 @@ export class IneptCodeBuildPipeline extends Construct {
         stageName: `Deploy${stageName}`,
         actions: [
             new S3DeployAction({
-                actionName: `Website${stageName}`,
+                actionName: `DeployWebsite${stageName}`,
                 input: outputWebsite,
                 bucket: websiteBucket
             })
