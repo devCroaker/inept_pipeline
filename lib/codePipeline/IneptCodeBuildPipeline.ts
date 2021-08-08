@@ -42,8 +42,8 @@ export class IneptCodeBuildPipeline extends Construct {
         actions: [
           new CodeBuildAction({
             actionName: 'Website',
-            project: new PipelineProject(this, 'BuildWebsite', {
-              projectName: `IneptWebsite`,
+            project: new PipelineProject(this, `BuildWebsite${stageName}`, {
+              projectName: `IneptWebsite${stageName}`,
               environmentVariables: {
                 websiteBucket: {
                   value: websiteBucket.bucketName,
