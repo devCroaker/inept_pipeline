@@ -4,6 +4,7 @@ import { BuildSpec, PipelineProject, BuildEnvironmentVariableType } from '@aws-c
 import { Artifact, Pipeline } from '@aws-cdk/aws-codepipeline'
 import { CodeBuildAction, GitHubSourceAction, GitHubTrigger, S3DeployAction } from '@aws-cdk/aws-codepipeline-actions'
 import { GITHUB_BRANCH, GITHUB_OWNER, GITHUB_TOKEN, WEBSITE_REPO } from '../config/config'
+import { Role, ServicePrincipal, ManagedPolicy, PolicyStatement } from '@aws-cdk/aws-iam'
 
 export class IneptCodeBuildPipeline extends Construct {
   readonly addDeployStage: (stageName: string, websiteBucket: Bucket) => void
@@ -37,6 +38,16 @@ export class IneptCodeBuildPipeline extends Construct {
 
       const outputWebsite = new Artifact()
 
+      const role = new Role(this, `BuildSpecRole${stageName}`, {
+        roleName: `BuildSpecRole${stageName}`,
+        assumedBy: new ServicePrincipal('codebuild.amazonaws.com')
+      })
+      role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AWSCodeBuildAdminAccess'))
+      role.addToPolicy(new PolicyStatement({
+        actions: ['s3:*'],
+        resources: [`${websiteBucket.bucketArn}/*`]
+      }))
+
       pipeline.addStage({
         stageName: `Build${stageName}`,
         actions: [
@@ -44,6 +55,7 @@ export class IneptCodeBuildPipeline extends Construct {
             actionName: `BuildWebsite${stageName}`,
             project: new PipelineProject(this, `BuildWebsite${stageName}`, {
               projectName: `IneptWebsite${stageName}`,
+              role,
               environmentVariables: {
                 websiteBucket: {
                   value: websiteBucket.bucketName,
