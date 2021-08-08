@@ -5,9 +5,15 @@ import { Artifact, Pipeline } from '@aws-cdk/aws-codepipeline'
 import { CodeBuildAction, GitHubSourceAction, GitHubTrigger, S3DeployAction } from '@aws-cdk/aws-codepipeline-actions'
 import { GITHUB_BRANCH, GITHUB_OWNER, GITHUB_TOKEN, WEBSITE_REPO } from '../config/config'
 import { Role, ServicePrincipal, ManagedPolicy, PolicyStatement } from '@aws-cdk/aws-iam'
+import { AuthOutputs } from '../auth/AuthStack'
+
+export type EnvVariables = {
+  websiteBucket: Bucket,
+  authOutputs: AuthOutputs
+}
 
 export class IneptCodeBuildPipeline extends Construct {
-  readonly addDeployStage: (stageName: string, websiteBucket: Bucket) => void
+  readonly addDeployStage: (stageName: string, envVariables: EnvVariables) => void
 
   constructor(scope: Construct, id: string) {
     super(scope, id)
@@ -34,7 +40,15 @@ export class IneptCodeBuildPipeline extends Construct {
       ]
     })
 
-    this.addDeployStage = (stageName: string, websiteBucket: Bucket) => {
+    this.addDeployStage = (stageName: string, envVariables: EnvVariables) => {
+      const { 
+        websiteBucket,
+        authOutputs: {
+          userPoolId,
+          userPoolClientId,
+          identityPoolId
+        }
+      } = envVariables
 
       const outputWebsite = new Artifact()
 
@@ -62,6 +76,18 @@ export class IneptCodeBuildPipeline extends Construct {
               environmentVariables: {
                 websiteBucket: {
                   value: websiteBucket.bucketName,
+                  type: BuildEnvironmentVariableType.PLAINTEXT
+                },
+                userPoolId: {
+                  value: userPoolId,
+                  type: BuildEnvironmentVariableType.PLAINTEXT
+                },
+                userPoolClientId: {
+                  value: userPoolClientId,
+                  type: BuildEnvironmentVariableType.PLAINTEXT
+                },
+                identityPoolId: {
+                  value: identityPoolId,
                   type: BuildEnvironmentVariableType.PLAINTEXT
                 }
               },

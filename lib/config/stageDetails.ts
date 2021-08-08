@@ -1,15 +1,20 @@
+export const BETA = 'Beta'
+export const PROD = 'Prod'
+
+export type StageName = typeof BETA | typeof PROD
+
 export type stage = {
-    stage: string,
+    stage: StageName,
     subdomain: string,
 }
 
 export const stages: stage[] = [
     {
-        stage: 'Beta',
+        stage: BETA,
         subdomain: 'dev'
     },
     {
-        stage: 'Prod',
+        stage: PROD,
         subdomain: ''
     }
 ]

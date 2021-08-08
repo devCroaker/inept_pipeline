@@ -7,8 +7,15 @@ export interface AuthStackProps extends StackProps {
     stageDetails: stage
 }
 
+export type AuthOutputs = {
+    userPoolId: UserPool["userPoolId"],
+    userPoolClientId: UserPoolClient["userPoolClientId"],
+    identityPoolId: CfnIdentityPool["ref"]
+}
+
 export class AuthStack extends Stack {
     public readonly role: Role
+    public readonly outputs: AuthOutputs
 
     constructor(scope: Construct, id: string, props: AuthStackProps) {
         super(scope, id)
@@ -68,5 +75,11 @@ export class AuthStack extends Stack {
             identityPoolId: identityPool.ref,
             roles: { authenticated: this.role.roleArn }
         })
+
+        this.outputs = {
+            userPoolId: userPool.userPoolId,
+            userPoolClientId: userPoolClient.userPoolClientId,
+            identityPoolId: identityPool.ref
+        }
     }
 }

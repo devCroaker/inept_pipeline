@@ -1,4 +1,4 @@
-import { Construct, Stack, RemovalPolicy } from '@aws-cdk/core'
+import { Construct, Stack, RemovalPolicy, StackProps } from '@aws-cdk/core'
 import { Bucket } from '@aws-cdk/aws-s3'
 import { PolicyStatement } from '@aws-cdk/aws-iam'
 import { ARecord, HostedZone, RecordTarget } from '@aws-cdk/aws-route53'
@@ -14,11 +14,25 @@ import {
 import { CloudFrontTarget } from '@aws-cdk/aws-route53-targets/lib'
 import { IneptCodeBuildPipeline } from '../codePipeline/IneptCodeBuildPipeline'
 import { AWS_SSL_REGION, WEBSITE_DOMAIN } from '../config/config'
-import { stages } from '../config/stageDetails'
+import { stages, BETA, PROD } from '../config/stageDetails'
+import { AuthOutputs } from '../auth/AuthStack'
+
+export interface WebsiteStackProps extends StackProps {
+    envVariables: {
+        [BETA]: {
+            authOutputs?: AuthOutputs
+        },
+        [PROD]: {
+            authOutputs?: AuthOutputs
+        }
+    }
+}
 
 export class IneptWebsiteStack extends Stack {
-    constructor(scope: Construct, id: string) {
+    constructor(scope: Construct, id: string, props: WebsiteStackProps) {
         super(scope, id)
+
+        const { envVariables } = props
 
         const codePipeline = new IneptCodeBuildPipeline(this, `IneptCodeBuildPipeline`)
 
@@ -85,7 +99,10 @@ export class IneptWebsiteStack extends Stack {
                 zone
             })
 
-            codePipeline.addDeployStage(stageName, websiteBucket)
+            codePipeline.addDeployStage(stageName, {
+                websiteBucket,
+                authOutputs: envVariables[stageName].authOutputs!
+            })
 
         })
     }
