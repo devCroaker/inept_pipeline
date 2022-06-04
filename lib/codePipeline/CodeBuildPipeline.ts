@@ -1,10 +1,11 @@
-import { Construct, SecretValue } from '@aws-cdk/core'
-import { Bucket } from '@aws-cdk/aws-s3'
-import { BuildSpec, PipelineProject, BuildEnvironmentVariableType } from '@aws-cdk/aws-codebuild'
-import { Artifact, Pipeline } from '@aws-cdk/aws-codepipeline'
-import { CodeBuildAction, GitHubSourceAction, GitHubTrigger, S3DeployAction } from '@aws-cdk/aws-codepipeline-actions'
-import { GITHUB_BRANCH, GITHUB_OWNER, GITHUB_TOKEN, WEBSITE_REPO, AWS_REGION } from '../config/config'
-import { Role, ServicePrincipal, ManagedPolicy, PolicyStatement } from '@aws-cdk/aws-iam'
+import { Construct } from 'constructs'
+import { SecretValue } from 'aws-cdk-lib/core'
+import { Bucket } from 'aws-cdk-lib/aws-s3'
+import { BuildSpec, PipelineProject, BuildEnvironmentVariableType } from 'aws-cdk-lib/aws-codebuild'
+import { Artifact, Pipeline } from 'aws-cdk-lib/aws-codepipeline'
+import { CodeBuildAction, GitHubSourceAction, GitHubTrigger, S3DeployAction } from 'aws-cdk-lib/aws-codepipeline-actions'
+import { GITHUB_BRANCH, GITHUB_OWNER, GITHUB_TOKEN, WEBSITE_REPO, AWS_REGION, PREFIX } from '../config/config'
+import { Role, ServicePrincipal, ManagedPolicy, PolicyStatement } from 'aws-cdk-lib/aws-iam'
 import { AuthOutputs } from '../auth/AuthStack'
 
 export type EnvVariables = {
@@ -12,14 +13,14 @@ export type EnvVariables = {
   authOutputs: AuthOutputs
 }
 
-export class IneptCodeBuildPipeline extends Construct {
+export class CodeBuildPipeline extends Construct {
   readonly addDeployStage: (stageName: string, envVariables: EnvVariables) => void
 
   constructor(scope: Construct, id: string) {
     super(scope, id)
 
-    const pipeline = new Pipeline(this, `IneptWebCodePipeline`, {
-      pipelineName: `IneptWebCodePipeline`,
+    const pipeline = new Pipeline(this, `${PREFIX}WebCodePipeline`, {
+      pipelineName: `${PREFIX}WebCodePipeline`,
       restartExecutionOnUpdate: true
     })
 
@@ -71,7 +72,7 @@ export class IneptCodeBuildPipeline extends Construct {
           new CodeBuildAction({
             actionName: `BuildWebsite${stageName}`,
             project: new PipelineProject(this, `BuildWebsite${stageName}`, {
-              projectName: `IneptWebsite${stageName}`,
+              projectName: `${PREFIX}Website${stageName}`,
               role,
               environmentVariables: {
                 websiteBucket: {

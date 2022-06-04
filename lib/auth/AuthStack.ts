@@ -1,7 +1,9 @@
-import { Stack, Construct, StackProps } from '@aws-cdk/core'
-import { CfnIdentityPool, CfnIdentityPoolRoleAttachment, UserPool, UserPoolClient } from '@aws-cdk/aws-cognito'
-import { Effect, FederatedPrincipal, PolicyStatement, Role } from '@aws-cdk/aws-iam'
+import { Construct } from 'constructs'
+import { Stack, StackProps } from 'aws-cdk-lib/core'
+import { CfnIdentityPool, CfnIdentityPoolRoleAttachment, UserPool, UserPoolClient } from 'aws-cdk-lib/aws-cognito'
+import { Effect, FederatedPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam'
 import { stage } from '../config/stageDetails'
+import { PREFIX } from '../config/config'
 
 export interface AuthStackProps extends StackProps {
     stageDetails: stage
@@ -22,21 +24,21 @@ export class AuthStack extends Stack {
 
         const { stageDetails: { stage } } = props
 
-        const userPool = new UserPool(this, 'UserPool', {
-            userPoolName: `UserPool${stage}`,
+        const userPool = new UserPool(this, `${PREFIX}UserPool`, {
+            userPoolName: `${PREFIX}UserPool${stage}`,
             selfSignUpEnabled: true,
             autoVerify: { email: true },
             signInAliases: { email: true }
         })
 
-        const userPoolClient = new UserPoolClient(this, 'UserPoolClient', {
-            userPoolClientName: `UserPoolClient${stage}`,
+        const userPoolClient = new UserPoolClient(this, `${PREFIX}UserPoolClient`, {
+            userPoolClientName: `${PREFIX}UserPoolClient${stage}`,
             userPool,
             generateSecret: false
         })
 
-        const identityPool = new CfnIdentityPool(this, 'IdentityPool', {
-            identityPoolName: `IdentityPool${stage}`,
+        const identityPool = new CfnIdentityPool(this, `${PREFIX}IdentityPool`, {
+            identityPoolName: `${PREFIX}IdentityPool${stage}`,
             allowUnauthenticatedIdentities: false,
             cognitoIdentityProviders: [
                 {
@@ -46,8 +48,8 @@ export class AuthStack extends Stack {
             ]
         })
 
-        this.role = new Role(this, 'DefaultAuthRole', {
-            roleName: `DefaultAuthRole${stage}`,
+        this.role = new Role(this, `${PREFIX}DefaultAuthRole`, {
+            roleName: `${PREFIX}DefaultAuthRole${stage}`,
             assumedBy: new FederatedPrincipal(
                 'cognito-identity.amazonaws.com',
                 {
@@ -71,7 +73,7 @@ export class AuthStack extends Stack {
             resources: ['*']
         }))
 
-        new CfnIdentityPoolRoleAttachment(this, "IdentityPoolRoleAttachment", {
+        new CfnIdentityPoolRoleAttachment(this, `${PREFIX}IdentityPoolRoleAttachment`, {
             identityPoolId: identityPool.ref,
             roles: { authenticated: this.role.roleArn }
         })

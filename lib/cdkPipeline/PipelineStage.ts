@@ -1,9 +1,11 @@
-import { IneptWebsiteStack, WebsiteStackProps } from './IneptWebsiteStack'
-import { Stage, Construct, StageProps } from '@aws-cdk/core'
+import { Construct } from 'constructs'
+import { Stage, StageProps } from 'aws-cdk-lib/core'
+import { WebsiteStack, WebsiteStackProps } from './WebsiteStack'
 import { stages, BETA, PROD } from '../config/stageDetails'
 import { AuthStack } from '../auth/AuthStack'
+import { PREFIX } from '../config/config'
 
-export class IneptPipelineStage extends Stage {
+export class PipelineStage extends Stage {
     constructor(scope: Construct, id: string, props: StageProps) {
         super(scope, id, props)
 
@@ -21,6 +23,6 @@ export class IneptPipelineStage extends Stage {
             websiteInputs.envVariables[stage].authOutputs = auth.outputs
         })
 
-        new IneptWebsiteStack(this, 'IneptWebsite', websiteInputs)
+        new WebsiteStack(this, `${PREFIX}IneptWebsite`, websiteInputs)
     }
 }

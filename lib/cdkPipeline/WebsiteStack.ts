@@ -1,19 +1,20 @@
-import { Construct, Stack, RemovalPolicy, StackProps } from '@aws-cdk/core'
-import { Bucket } from '@aws-cdk/aws-s3'
-import { PolicyStatement } from '@aws-cdk/aws-iam'
-import { ARecord, HostedZone, RecordTarget } from '@aws-cdk/aws-route53'
-import { HttpsRedirect } from '@aws-cdk/aws-route53-patterns'
-import { DnsValidatedCertificate } from '@aws-cdk/aws-certificatemanager'
+import { Construct } from 'constructs'
+import { Stack, RemovalPolicy, StackProps } from 'aws-cdk-lib/core'
+import { Bucket } from 'aws-cdk-lib/aws-s3'
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam'
+import { ARecord, HostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53'
+import { HttpsRedirect } from 'aws-cdk-lib/aws-route53-patterns'
+import { DnsValidatedCertificate } from 'aws-cdk-lib/aws-certificatemanager'
 import { 
     CloudFrontWebDistribution,
     OriginAccessIdentity, 
     SecurityPolicyProtocol, 
     SSLMethod, 
     ViewerCertificate 
-} from '@aws-cdk/aws-cloudfront'
-import { CloudFrontTarget } from '@aws-cdk/aws-route53-targets/lib'
-import { IneptCodeBuildPipeline } from '../codePipeline/IneptCodeBuildPipeline'
-import { AWS_SSL_REGION, WEBSITE_DOMAIN } from '../config/config'
+} from 'aws-cdk-lib/aws-cloudfront'
+import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets/lib'
+import { CodeBuildPipeline } from '../codePipeline/CodeBuildPipeline'
+import { AWS_SSL_REGION, PREFIX, WEBSITE_DOMAIN } from '../config/config'
 import { stages, BETA, PROD } from '../config/stageDetails'
 import { AuthOutputs } from '../auth/AuthStack'
 
@@ -28,20 +29,20 @@ export interface WebsiteStackProps extends StackProps {
     }
 }
 
-export class IneptWebsiteStack extends Stack {
+export class WebsiteStack extends Stack {
     constructor(scope: Construct, id: string, props: WebsiteStackProps) {
         super(scope, id)
 
         const { envVariables } = props
 
-        const codePipeline = new IneptCodeBuildPipeline(this, `IneptCodeBuildPipeline`)
+        const codePipeline = new CodeBuildPipeline(this, `${PREFIX}CodeBuildPipeline`)
 
-        const zone = HostedZone.fromLookup(this, 'IneptZone', {
+        const zone = HostedZone.fromLookup(this, `${PREFIX}Zone`, {
             domainName: WEBSITE_DOMAIN
         })
 
-        const cloudFrontOAI = new OriginAccessIdentity(this, 'IneptOAI', {
-            comment: 'OAI for inept website'
+        const cloudFrontOAI = new OriginAccessIdentity(this, `${PREFIX}OAI`, {
+            comment: 'OAI for the website'
         })
 
         new HttpsRedirect(this, 'wwwToNonWww', {
@@ -54,14 +55,14 @@ export class IneptWebsiteStack extends Stack {
             const { stage: stageName, subdomain } = stage
 
             const domainName = (stageName === 'Beta') ? subdomain + '.' + WEBSITE_DOMAIN : WEBSITE_DOMAIN
-            const certificate = new DnsValidatedCertificate(this, `IneptCertificate${stageName}`, {
+            const certificate = new DnsValidatedCertificate(this, `${PREFIX}Certificate${stageName}`, {
                 domainName,
                 hostedZone: zone,
                 region: AWS_SSL_REGION
             })
 
-            const websiteBucket = new Bucket(this, `IneptWebsiteFiles${stageName}`, {
-                bucketName: `inept-website-files-${stageName.toLowerCase()}`,
+            const websiteBucket = new Bucket(this, `${PREFIX}WebsiteFiles${stageName}`, {
+                bucketName: `${PREFIX.toLowerCase()}-website-files-${stageName.toLowerCase()}`,
                 websiteIndexDocument: "index.html",
                 websiteErrorDocument: "index.html",
                 removalPolicy: RemovalPolicy.DESTROY
@@ -76,7 +77,7 @@ export class IneptWebsiteStack extends Stack {
             )
             websiteBucket.addToResourcePolicy(cloudFrontS3AccessPolicy)
 
-            const distribution = new CloudFrontWebDistribution(this, `IneptDistribution${stageName}`, {
+            const distribution = new CloudFrontWebDistribution(this, `${PREFIX}Distribution${stageName}`, {
                 viewerCertificate: ViewerCertificate.fromAcmCertificate(certificate, {
                     aliases: [domainName],
                     securityPolicy: SecurityPolicyProtocol.TLS_V1_1_2016,
@@ -91,7 +92,7 @@ export class IneptWebsiteStack extends Stack {
                 }]
             })
 
-            new ARecord(this, `IneptAliasRecord${stageName}`, {
+            new ARecord(this, `${PREFIX}AliasRecord${stageName}`, {
                 recordName: domainName,
                 target: RecordTarget.fromAlias(
                     new CloudFrontTarget(distribution)
