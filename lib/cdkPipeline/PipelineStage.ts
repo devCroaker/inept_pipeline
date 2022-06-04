@@ -20,9 +20,9 @@ export class PipelineStage extends Stage {
 
             const auth = new AuthStack(this, `AuthStack${stage}`, {stageDetails})
 
-            //websiteInputs.envVariables[stage].authOutputs = auth.outputs
+            websiteInputs.envVariables[stage].authOutputs = auth.outputs
         })
 
-        new WebsiteStack(this, `${PREFIX}IneptWebsite`, websiteInputs)
+        new WebsiteStack(this, `${PREFIX}Website`, websiteInputs)
     }
 }
