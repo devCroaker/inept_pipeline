@@ -12,7 +12,7 @@ export class PipelineStage extends Stage {
         const websiteInputs: WebsiteStackProps = {
             envVariables: {
                 [BETA]: {},
-                [PROD]: {}
+                [PROD]: {},
             }
         }
         stages.forEach(stageDetails => {
@@ -20,7 +20,7 @@ export class PipelineStage extends Stage {
 
             const auth = new AuthStack(this, `AuthStack${stage}`, {stageDetails})
 
-            websiteInputs.envVariables[stage].authOutputs = auth.outputs
+            //websiteInputs.envVariables[stage].authOutputs = auth.outputs
         })
 
         new WebsiteStack(this, `${PREFIX}IneptWebsite`, websiteInputs)

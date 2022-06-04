@@ -10,7 +10,7 @@ import { AuthOutputs } from '../auth/AuthStack'
 
 export type EnvVariables = {
   websiteBucket: Bucket,
-  authOutputs: AuthOutputs
+  authOutputs?: AuthOutputs
 }
 
 export class CodeBuildPipeline extends Construct {
@@ -44,11 +44,7 @@ export class CodeBuildPipeline extends Construct {
     this.addDeployStage = (stageName: string, envVariables: EnvVariables) => {
       const { 
         websiteBucket,
-        authOutputs: {
-          userPoolId,
-          userPoolClientId,
-          identityPoolId
-        }
+        authOutputs,
       } = envVariables
 
       const outputWebsite = new Artifact()
@@ -84,15 +80,15 @@ export class CodeBuildPipeline extends Construct {
                   type: BuildEnvironmentVariableType.PLAINTEXT
                 },
                 userPoolId: {
-                  value: userPoolId,
+                  value: authOutputs?.userPoolId || 'undefined',
                   type: BuildEnvironmentVariableType.PLAINTEXT
                 },
                 userPoolClientId: {
-                  value: userPoolClientId,
+                  value: authOutputs?.userPoolClientId || 'undefined',
                   type: BuildEnvironmentVariableType.PLAINTEXT
                 },
                 identityPoolId: {
-                  value: identityPoolId,
+                  value: authOutputs?.identityPoolId || 'undefined',
                   type: BuildEnvironmentVariableType.PLAINTEXT
                 }
               },

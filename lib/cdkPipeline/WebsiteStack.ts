@@ -102,7 +102,7 @@ export class WebsiteStack extends Stack {
 
             codePipeline.addDeployStage(stageName, {
                 websiteBucket,
-                authOutputs: envVariables[stageName].authOutputs!
+                authOutputs: envVariables[stageName].authOutputs
             })
 
         })
