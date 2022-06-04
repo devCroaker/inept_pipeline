@@ -1,5 +1,5 @@
 import { Construct } from 'constructs'
-import { Stack, SecretValue, StackProps } from 'aws-cdk-lib/core'
+import { Stack, SecretValue, StackProps } from 'aws-cdk-lib'
 import { CodeBuildStep, CodePipeline, CodePipelineSource } from 'aws-cdk-lib/pipelines'
 import { GitHubTrigger } from 'aws-cdk-lib/aws-codepipeline-actions'
 
