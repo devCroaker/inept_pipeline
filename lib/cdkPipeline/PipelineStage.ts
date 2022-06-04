@@ -1,5 +1,5 @@
 import { Construct } from 'constructs'
-import { Stage, StageProps } from 'aws-cdk-lib/core'
+import { Stage, StageProps } from 'aws-cdk-lib'
 import { WebsiteStack, WebsiteStackProps } from './WebsiteStack'
 import { stages, BETA, PROD } from '../config/stageDetails'
 import { AuthStack } from '../auth/AuthStack'

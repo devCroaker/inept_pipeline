@@ -1,5 +1,5 @@
 import { Construct } from 'constructs'
-import { SecretValue } from 'aws-cdk-lib/core'
+import { SecretValue } from 'aws-cdk-lib'
 import { Bucket } from 'aws-cdk-lib/aws-s3'
 import { BuildSpec, PipelineProject, BuildEnvironmentVariableType } from 'aws-cdk-lib/aws-codebuild'
 import { Artifact, Pipeline } from 'aws-cdk-lib/aws-codepipeline'

@@ -27,9 +27,13 @@ export class InfPipeline extends Stack {
           trigger: GitHubTrigger.WEBHOOK,
         }),
         installCommands: [
-          'npm i -g npm && npm ci'
+          'npm i -g npm && npm install -g aws-cdk'
         ],
-        commands: []
+        commands: [
+          'npm ci',
+          'npm run build',
+          'npx cdk synth',
+        ]
       })
     })
 

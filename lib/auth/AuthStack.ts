@@ -1,5 +1,5 @@
 import { Construct } from 'constructs'
-import { Stack, StackProps } from 'aws-cdk-lib/core'
+import { Stack, StackProps } from 'aws-cdk-lib'
 import { CfnIdentityPool, CfnIdentityPoolRoleAttachment, UserPool, UserPoolClient } from 'aws-cdk-lib/aws-cognito'
 import { Effect, FederatedPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam'
 import { stage } from '../config/stageDetails'

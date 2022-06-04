@@ -1,5 +1,5 @@
 import { Construct } from 'constructs'
-import { Stack, RemovalPolicy, StackProps } from 'aws-cdk-lib/core'
+import { Stack, RemovalPolicy, StackProps } from 'aws-cdk-lib'
 import { Bucket } from 'aws-cdk-lib/aws-s3'
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam'
 import { ARecord, HostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53'
@@ -12,11 +12,11 @@ import {
     SSLMethod, 
     ViewerCertificate 
 } from 'aws-cdk-lib/aws-cloudfront'
-import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets/lib'
 import { CodeBuildPipeline } from '../codePipeline/CodeBuildPipeline'
 import { AWS_SSL_REGION, PREFIX, WEBSITE_DOMAIN } from '../config/config'
 import { stages, BETA, PROD } from '../config/stageDetails'
 import { AuthOutputs } from '../auth/AuthStack'
+import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets'
 
 export interface WebsiteStackProps extends StackProps {
     envVariables: {
