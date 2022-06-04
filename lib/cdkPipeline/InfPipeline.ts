@@ -22,18 +22,14 @@ export class InfPipeline extends Stack {
       pipelineName: `${PREFIX}Pipeline`,
       selfMutation: true,
       synth: new CodeBuildStep('Synth', {
-        input: CodePipelineSource.gitHub(`${GITHUB_OWNER}/${GITHUB_BRANCH}`, GITHUB_BRANCH, {
+        input: CodePipelineSource.gitHub(`${GITHUB_OWNER}/${PIPELINE_REPO}`, GITHUB_BRANCH, {
           authentication: SecretValue.secretsManager(GITHUB_TOKEN),
           trigger: GitHubTrigger.WEBHOOK,
         }),
         installCommands: [
-          'npm i -g npm && npm install -g aws-cdk'
+          'npm i -g npm && npm ci'
         ],
-        commands: [
-          'npm ci',
-          'npm run build',
-          'npx cdk synth',
-        ]
+        commands: []
       })
     })
 
