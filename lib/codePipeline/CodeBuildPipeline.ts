@@ -1,7 +1,7 @@
 import { Construct } from 'constructs'
 import { SecretValue } from 'aws-cdk-lib'
 import { Bucket } from 'aws-cdk-lib/aws-s3'
-import { BuildSpec, PipelineProject, BuildEnvironmentVariableType } from 'aws-cdk-lib/aws-codebuild'
+import { BuildSpec, PipelineProject, BuildEnvironmentVariableType, LinuxBuildImage } from 'aws-cdk-lib/aws-codebuild'
 import { Artifact, Pipeline } from 'aws-cdk-lib/aws-codepipeline'
 import { CodeBuildAction, GitHubSourceAction, GitHubTrigger, S3DeployAction } from 'aws-cdk-lib/aws-codepipeline-actions'
 import { GITHUB_BRANCH, GITHUB_OWNER, GITHUB_TOKEN, WEBSITE_REPO, AWS_REGION, PREFIX } from '../config/config'
@@ -70,6 +70,9 @@ export class CodeBuildPipeline extends Construct {
             project: new PipelineProject(this, `BuildWebsite${stageName}`, {
               projectName: `${PREFIX}Website${stageName}`,
               role,
+              environment: {
+                buildImage: LinuxBuildImage.STANDARD_7_0,
+              },
               environmentVariables: {
                 websiteBucket: {
                   value: websiteBucket.bucketName,

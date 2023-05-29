@@ -1,9 +1,9 @@
 import { Construct } from 'constructs'
 import { Stack, StackProps } from 'aws-cdk-lib'
-import { CfnIdentityPool, CfnIdentityPoolRoleAttachment, UserPool, UserPoolClient } from 'aws-cdk-lib/aws-cognito'
+import { AccountRecovery, CfnIdentityPool, CfnIdentityPoolRoleAttachment, UserPool, UserPoolClient } from 'aws-cdk-lib/aws-cognito'
 import { Effect, FederatedPrincipal, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam'
 import { stage } from '../config/stageDetails'
-import { PREFIX } from '../config/config'
+import { PREFIX, WEBSITE_DOMAIN } from '../config/config'
 
 export interface AuthStackProps extends StackProps {
     stageDetails: stage
@@ -28,13 +28,18 @@ export class AuthStack extends Stack {
             userPoolName: `${PREFIX}UserPool${stage}`,
             selfSignUpEnabled: true,
             autoVerify: { email: true },
-            signInAliases: { email: true }
+            signInAliases: { email: true },
+            signInCaseSensitive: false,
+            accountRecovery: AccountRecovery.EMAIL_AND_PHONE_WITHOUT_MFA,
+            userVerification: {
+                emailSubject: `Verify your email for ${WEBSITE_DOMAIN}`,
+            },
         })
 
         const userPoolClient = new UserPoolClient(this, `${PREFIX}UserPoolClient`, {
             userPoolClientName: `${PREFIX}UserPoolClient${stage}`,
             userPool,
-            generateSecret: false
+            generateSecret: false,
         })
 
         const identityPool = new CfnIdentityPool(this, `${PREFIX}IdentityPool`, {
